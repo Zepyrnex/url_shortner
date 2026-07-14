@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🚀 URL Shortener</h1>
+
+    <p>Paste your long URL below</p>
+
+    <input
+        type="text"
+        id="urlInput"
+        placeholder="https://example.com"
+    >
+
+    <button id="shortenBtn">
+        Shorten URL
+    </button>
+
+    <div id="result" class="hidden">
+
+        <h3>Your Short URL</h3>
+
+        <a id="shortUrl" target="_blank"></a>
+
+        <div class="buttons">
+
+            <button id="copyBtn">
+                📋 Copy
+            </button>
+
+            <button id="openBtn">
+                🔗 Open
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
