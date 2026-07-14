@@ -1,16 +1,17 @@
 const prisma = require("../prisma");
 
-const createShortUrl = async (originalUrl, shortCode) => {
-    return prisma.url.create({
+const createShortUrl = async (url, shortCode, expiresAt) => {
+    return await prisma.url.create({
         data: {
-            originalUrl,
+            originalUrl: url,
             shortCode,
+            expiresAt,
         },
     });
 };
 
 const findByShortCode = async (shortCode) => {
-    return prisma.url.findUnique({
+    return await prisma.url.findUnique({
         where: {
             shortCode,
         },
@@ -18,7 +19,7 @@ const findByShortCode = async (shortCode) => {
 };
 
 const incrementClicks = async (shortCode) => {
-    return prisma.url.update({
+    return await prisma.url.update({
         where: {
             shortCode,
         },
@@ -31,21 +32,15 @@ const incrementClicks = async (shortCode) => {
 };
 
 const getUrlStats = async (shortCode) => {
-    return prisma.url.findUnique({
+    return await prisma.url.findUnique({
         where: {
             shortCode,
-        },
-        select: {
-            originalUrl: true,
-            shortCode: true,
-            clicks: true,
-            createdAt: true,
         },
     });
 };
 
 const deleteShortUrl = async (shortCode) => {
-    return prisma.url.delete({
+    return await prisma.url.delete({
         where: {
             shortCode,
         },

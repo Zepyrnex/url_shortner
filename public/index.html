@@ -1,54 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener</title>
-
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
 <div class="container">
 
-    <h1>🚀 URL Shortener</h1>
+    <div class="logo">
+<pre>
+▞█▚
+█▄█
+▚█▞
+</pre>
+    </div>
 
-    <p>Paste your long URL below</p>
+    <h1>tinyweb</h1>
+
+    <p class="subtitle">
+        minimal url shortener
+    </p>
 
     <input
-        type="text"
         id="urlInput"
-        placeholder="https://example.com"
-    >
+        type="text"
+        placeholder="paste your url here...">
+
+    <details class="advanced">
+
+        <summary>advanced</summary>
+
+        <input
+            id="customCode"
+            type="text"
+            placeholder="custom alias (optional)">
+
+        <select id="expiry">
+            <option value="">never expire</option>
+            <option value="1">1 day</option>
+            <option value="7">7 days</option>
+            <option value="30">30 days</option>
+        </select>
+
+    </details>
 
     <button id="shortenBtn">
-        Shorten URL
+        shorten
     </button>
 
     <div id="result" class="hidden">
 
-        <h3>Your Short URL</h3>
+        <p class="resultTitle">
+            created ✓
+        </p>
 
         <a id="shortUrl" target="_blank"></a>
 
-        <div class="buttons">
+        <div id="qrcode"></div>
+
+        <div class="actions">
 
             <button id="copyBtn">
-                📋 Copy
+                copy
             </button>
 
             <button id="openBtn">
-                🔗 Open
+                open
+            </button>
+
+            <button id="downloadQR">
+                qr
             </button>
 
         </div>
 
     </div>
 
+    <details id="recentSection">
+
+        <summary>
+            recent links
+        </summary>
+
+        <div id="recentLinks"></div>
+
+    </details>
+
+    <div class="footer">
+        node • express • prisma • railway
+    </div>
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="script.js"></script>
-
-</body>
-</html>

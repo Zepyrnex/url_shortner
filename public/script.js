@@ -4,39 +4,91 @@ const result = document.getElementById("result");
 const shortUrl = document.getElementById("shortUrl");
 const copyBtn = document.getElementById("copyBtn");
 const openBtn = document.getElementById("openBtn");
-shortenBtn.addEventListener("click", async () => {
+const customCodeInput = document.getElementById("customCode");
+const expiry = document.getElementById("expiry");
+const qrContainer = document.getElementById("qrcode");
+const downloadQR = document.getElementById("downloadQR");
 
-    const url = urlInput.value;
-    if(!url){
+shortenBtn.addEventListener("click", async () => {
+    const url = urlInput.value.trim();
+    if (!url) {
         alert("Please enter a URL");
         return;
     }
+    try {
+        shortenBtn.disabled = true;
+        shortenBtn.textContent = "Generating...";
 
-    const response = await fetch("/shorten",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            url
-        })
-    });
+        const response = await fetch("/shorten", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url,
+                customCode: customCodeInput.value.trim(),
+                expiry: expiry.value
+            })
+        });
+        const data = await response.json();
 
-    const data = await response.json();
-    if(data.success){
+        if (!response.ok) {
+            throw new Error(data.message || "Something went wrong");
+        }
+
         result.classList.remove("hidden");
+
         shortUrl.textContent = data.data.shortUrl;
         shortUrl.href = data.data.shortUrl;
-        copyBtn.onclick = ()=>{
+
+        // Clear previous QR
+        qrContainer.innerHTML = "";
+
+        // Generate QR Code
+        new QRCode(qrContainer, {
+            text: data.data.shortUrl,
+            width: 180,
+            height: 180,
+        });
+
+        // Copy Button
+        copyBtn.onclick = () => {
             navigator.clipboard.writeText(data.data.shortUrl);
-            alert("Copied!");
+            alert("Link copied!");
         };
-        openBtn.onclick = ()=>{
-            window.open(data.data.shortUrl);
+
+        // Open Button
+        openBtn.onclick = () => {
+            window.open(data.data.shortUrl, "_blank");
         };
+
+    } catch (err) {
+
+        alert(err.message);
+
+    } finally {
+
+        shortenBtn.disabled = false;
+        shortenBtn.textContent = "SHORTEN";
+
     }
 
-    else{
-        alert(data.message);
+});
+
+downloadQR.addEventListener("click", () => {
+
+    const img = document.querySelector("#qrcode img");
+
+    if (!img) {
+        alert("Generate a QR code first.");
+        return;
     }
+
+    const link = document.createElement("a");
+
+    link.href = img.src;
+    link.download = "tinyweb-qr.png";
+
+    link.click();
+
 });

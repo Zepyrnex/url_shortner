@@ -1,5 +1,4 @@
 const generateCode = require("../utils/generateCode");
-
 const {
     createShortUrl,
     findByShortCode,
@@ -11,8 +10,7 @@ const {
 // POST /shorten
 const shortenUrl = async (req, res) => {
     try {
-        const { url } = req.body;
-
+        const { url, customCode, expiry } = req.body;
         if (!url) {
             return res.status(400).json({
                 message: "URL is required",
@@ -26,18 +24,32 @@ const shortenUrl = async (req, res) => {
             });
         }
         let shortCode;
-        let exists = true;
-
-        while (exists) {
-            shortCode = generateCode();
-
-            const existing = await findByShortCode(shortCode);
-
-            exists = !!existing;
+        if (customCode) {
+            const existing = await findByShortCode(customCode);
+            if (existing) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Custom alias already exists."
+                });
+            }
+            shortCode = customCode;
+        
+        } else {
+            let exists = true;
+            while (exists) {
+                shortCode = generateCode();
+                const existing = await findByShortCode(shortCode);
+                exists = !!existing;
+            }
         }
+        let expiresAt = null;
 
-        const newUrl = await createShortUrl(url, shortCode);
-
+        if (expiry) {
+            expiresAt = new Date(); 
+            expiresAt.setDate(expiresAt.getDate() + Number(expiry));
+            }
+        const newUrl = await createShortUrl(url, shortCode, expiresAt);
+        
         res.status(201).json({
             success: true,
             message: "Short URL created successfully",
@@ -70,6 +82,14 @@ const redirectUrl = async (req, res) => {
             });
         }
 
+        // 👇 STEP 7 GOES HERE
+        if (url.expiresAt && new Date() > new Date(url.expiresAt)) {
+            return res.status(410).json({
+                success: false,
+                message: "This short link has expired.",
+            });
+        }
+
         await incrementClicks(shortCode);
 
         return res.redirect(url.originalUrl);
@@ -77,7 +97,7 @@ const redirectUrl = async (req, res) => {
     } catch (err) {
         console.error(err);
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Internal Server Error",
         });
     }
